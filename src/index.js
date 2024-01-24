@@ -7,6 +7,7 @@ window.onload = async function () {
 };
 
 let isCelcius = true;
+let isHourly = true;
 let currentLocation = null;
 
 function GeneralContent(initialLocation, initial) {
@@ -52,7 +53,7 @@ function GeneralContent(initialLocation, initial) {
   metricInput.id = "metricInput";
 
   const mainDiv = document.createElement("div");
-  mainDiv.classList = "w-full h-full flex flex-col items-center px-4";
+  mainDiv.classList = "w-full h-full flex flex-col space-y-8 items-center px-4";
 
   if (initial) {
     if (initialLocation === null) {
@@ -69,14 +70,11 @@ function GeneralContent(initialLocation, initial) {
     WeatherDiv(mainDiv, initialLocation, true);
   }
 
-
-
   header.appendChild(cityInput);
   header.appendChild(headerTitle);
   header.appendChild(metricRadioButtonsList());
 
   main.appendChild(mainDiv);
-
   content.appendChild(header);
   content.appendChild(main);
 }
@@ -103,14 +101,54 @@ async function WeatherDiv(mainDiv, initialLocation, isCity = false) {
   const weatherDiv = document.createElement("div");
   weatherDiv.classList = "w-full h-full flex flex-col items-center px-4";
   const weatherDataDiv = document.createElement("div");
+  const currentDayForecast = weatherData.forecast.forecastday[0];
   weatherDataDiv.classList =
-    "w-1/2 p-16 rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none m-5 bg-slate-400";
-  weatherDataDiv.innerHTML = `<h2 class='text-2xl text-slate-900 font-semibold'> ${weatherData.location.name} </h2>
-    <h3 class='text-xl text-slate-900 font-semibold'> ${weatherData.location.country}, ${weatherData.location.localtime} </h3>
-    <h3 class='text-xl text-slate-900 font-semibold'> Currently: ${(isCelcius)? weatherData.current.temp_c + '°C' : weatherData.current.temp_f + '°F' } </h3>`;
+    "w-1/2 p-16 rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none m-5 bg-slate-400 flex flex-col space-y-4";
+  weatherDataDiv.innerHTML = `<h2 class='text-3xl text-slate-900 font-semibold'> ${
+    weatherData.location.name
+  } </h2>
+    <h3 class='text-2xl text-slate-900 font-semibold'> ${
+      weatherData.location.country
+    }, ${weatherData.location.localtime} </h3>
+    <h3 class='text-xl text-slate-900 font-semibold'> Currently: ${
+      isCelcius
+        ? weatherData.current.temp_c + "°C"
+        : weatherData.current.temp_f + "°F"
+    } </h3>
+    <h4 class='text-xl text-slate-900 font-semibold'>Max: ${
+      isCelcius
+        ? currentDayForecast["day"].maxtemp_c + "°C"
+        : currentDayForecast["day"].maxtemp_f + "°F"
+    } | Low: ${
+    isCelcius
+      ? currentDayForecast["day"].mintemp_c + "°C"
+      : currentDayForecast["day"].mintemp_f + "°F"
+  }</h4>
+  <h4 class='text-lg text-slate-800 font-semibold'>Sun Rise: ${
+    currentDayForecast["astro"].sunrise
+  } | Sun Set: ${currentDayForecast["astro"].sunset}</h4>`;
+
   weatherDiv.appendChild(weatherDataDiv);
   mainDiv.appendChild(weatherDiv);
+  mainDiv.appendChild(switchHourlyDaily());
+  if (isHourly) {
+    mainDiv.appendChild(
+      HourlyForecastDiv(weatherData.forecast.forecastday[0]["hour"])
+    );
+  } else {
+    mainDiv.appendChild(
+      DailyForecastDiv(weatherData.forecast.forecastday.slice(1))
+    );
+  }
 }
+
+function switchHourlyDaily() {
+  // TODO
+}
+
+function HourlyForecastDiv(dayweatherData) {}
+
+function DailyForecastDiv(dayweatherData) {}
 
 function errorDiv(error, solution) {
   const errorDiv = document.createElement("div");
@@ -130,7 +168,6 @@ async function getLocation() {
         position.coords.latitude,
         position.coords.longitude,
       ];
-      console.log(positionData);
       return positionData;
     } else {
       console.log("Geolocation is not supported by this browser.");

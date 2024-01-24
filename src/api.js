@@ -24,6 +24,6 @@ export async function getWeatherData({ city, lat, lng }) {
     }
 
     const data = await getWeatherDataByUrl(url);
-    console.log(data);
+    //console.log(data);
     return data;
 }

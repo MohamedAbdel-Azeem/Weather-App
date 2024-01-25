@@ -99,7 +99,7 @@ async function WeatherDiv(mainDiv, initialLocation, isCity = false) {
     mainDiv.appendChild(errorDiv(weatherData.error.message, "Try Again?"));
   }
   const weatherDiv = document.createElement("div");
-  weatherDiv.classList = "w-full h-full flex flex-col items-center px-4";
+  weatherDiv.classList = "w-full flex flex-col items-center px-4";
   const weatherDataDiv = document.createElement("div");
   const currentDayForecast = weatherData.forecast.forecastday[0];
   weatherDataDiv.classList =
@@ -128,27 +128,98 @@ async function WeatherDiv(mainDiv, initialLocation, isCity = false) {
     currentDayForecast["astro"].sunrise
   } | Sun Set: ${currentDayForecast["astro"].sunset}</h4>`;
 
+  const extraDataDiv = document.createElement("div");
+  extraDataDiv.classList = "w-full flex flex-row justify-evenly items-center";
+  extraDataDiv.id = "extraDataDiv";
   weatherDiv.appendChild(weatherDataDiv);
   mainDiv.appendChild(weatherDiv);
-  mainDiv.appendChild(switchHourlyDaily());
+  mainDiv.appendChild(switchHourlyDaily(weatherData));
+  mainDiv.appendChild(extraDataDiv);
   if (isHourly) {
-    mainDiv.appendChild(
-      HourlyForecastDiv(weatherData.forecast.forecastday[0]["hour"])
-    );
+    HourlyForecastDiv(weatherData.forecast.forecastday[0]["hour"]);
   } else {
-    mainDiv.appendChild(
-      DailyForecastDiv(weatherData.forecast.forecastday.slice(1))
-    );
+    DailyForecastDiv(weatherData.forecast.forecastday.slice(1));
   }
 }
 
-function switchHourlyDaily() {
-  // TODO
+function switchHourlyDaily(weatherData) {
+  const ul = document.createElement("ul");
+  ul.className =
+    "items-center text-md font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white";
+
+  // Create the first li element
+  const li1 = document.createElement("li");
+  li1.className =
+    "w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600";
+
+  const div1 = document.createElement("div");
+  div1.className = "flex items-center justify-center px-4";
+  div1.style.cursor = "pointer";
+
+  div1.addEventListener("click", () => {
+    isHourly = true;
+    div1.style.backgroundColor = "green"; // Set color to green when clicked
+    div2.style.backgroundColor = "gray"; // Set color to gray when the other div is clicked
+    HourlyForecastDiv(weatherData.forecast.forecastday[0]["hour"]);
+  });
+
+  const label1 = document.createElement("label");
+  label1.textContent = "Hourly";
+  label1.className =
+    "w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300";
+
+  div1.appendChild(label1);
+  li1.appendChild(div1);
+
+  // Create the second li element
+  const li2 = document.createElement("li");
+  li2.className =
+    "w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600";
+
+  const div2 = document.createElement("div");
+  div2.className = "flex items-center justify-center px-4";
+  div2.style.cursor = "pointer";
+  div2.style.backgroundColor = "gray"; // Set initial color to gray
+
+  div2.addEventListener("click", () => {
+    isHourly = false;
+    div1.style.backgroundColor = "gray"; // Set color to gray when the other div is clicked
+    div2.style.backgroundColor = "green"; // Set color to green when clicked
+    DailyForecastDiv(weatherData);
+  });
+
+  if (!isHourly) {
+    div1.style.backgroundColor = "gray";
+    div2.style.backgroundColor = "green";
+  } else {
+    div1.style.backgroundColor = "green";
+    div2.style.backgroundColor = "gray";
+  }
+
+  const label2 = document.createElement("label");
+  label2.textContent = "Daily";
+  label2.className =
+    "w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300";
+
+  div2.appendChild(label2);
+  li2.appendChild(div2);
+
+  // Append the li elements to the ul
+  ul.appendChild(li1);
+  ul.appendChild(li2);
+
+  return ul;
 }
 
-function HourlyForecastDiv(dayweatherData) {}
+function HourlyForecastDiv(dayweatherData) {
+  const container = document.querySelector("#extraDataDiv");
+  if (container) container.innerHTML = "Hourly";
+}
 
-function DailyForecastDiv(dayweatherData) {}
+function DailyForecastDiv(dayweatherData) {
+  const container = document.querySelector("#extraDataDiv");
+  if (container) container.innerHTML = "Daily";
+}
 
 function errorDiv(error, solution) {
   const errorDiv = document.createElement("div");

@@ -1,5 +1,7 @@
 import tailwindcss from "./output.css";
 import { getWeatherData } from "./api.js";
+import GlideStyles from './glide.core.min.css';
+import Glide from "@glidejs/glide";
 
 window.onload = async function () {
   const location = await getLocation();
@@ -213,12 +215,43 @@ function switchHourlyDaily(weatherData) {
 
 function HourlyForecastDiv(dayweatherData) {
   const container = document.querySelector("#extraDataDiv");
-  if (container) container.innerHTML = "Hourly";
+  container.innerHTML = `<div class="glide mx-8 mb-8">
+  <div class="glide__track" data-glide-el="track">
+    <ul class="glide__slides">
+    </ul>
+  </div>
+  <div class="glide__arrows flex flex-row justify-center items-center space-x-6" data-glide-el="controls">
+    <button class="glide__arrow glide__arrow--left bg-slate-400 mt-4 p-2 rounded-lg shadow-md hover:scale-105" data-glide-dir="<">prev</button>
+    <button class="glide__arrow glide__arrow--right bg-slate-400 mt-4 p-2 rounded-lg shadow-md hover:scale-105" data-glide-dir=">">next</button>
+  </div>
+</div>`;
+  const glideList = document.querySelector(".glide__slides");
+
+  dayweatherData.forEach((hour) => {
+    const glideItem = document.createElement("li");
+    glideItem.innerHTML = `<div class='glide__slide rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none bg-slate-400 flex flex-col justify-center items-center'>
+    <h2 class='text-2xl text-slate-900 font-semibold'> ${
+      hour.time.split(" ")[1]
+    } </h2>
+    <h3 class='text-xl text-slate-700'>${
+      isCelcius ? hour.temp_c + "°C" : hour.temp_f + "°F"
+    }</h3>
+    <h4 class text-lg text-slate-700>${hour.condition.text}</h4>
+    </div>`;
+    glideList.appendChild(glideItem);
+  });
+
+  const glideConfig = {
+    type : "carousel",
+    perView : 3,
+  }
+
+  new Glide(".glide",glideConfig).mount();
 }
 
 function DailyForecastDiv(dayweatherData) {
   const container = document.querySelector("#extraDataDiv");
-  if (container) container.innerHTML = "Daily";
+  container.innerHTML = "Daily";
 }
 
 function errorDiv(error, solution) {

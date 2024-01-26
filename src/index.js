@@ -2,6 +2,7 @@ import tailwindcss from "./output.css";
 import { getWeatherData } from "./api.js";
 import GlideStyles from './glide.core.min.css';
 import Glide from "@glidejs/glide";
+import searchImg from "./assets/searchIcon.png";
 
 window.onload = async function () {
   const location = await getLocation();
@@ -32,12 +33,13 @@ function GeneralContent(initialLocation, initial) {
     "text-slate-50",
     "py-4"
   );
-
+  const SearchDiv = document.createElement("div");
+  SearchDiv.classList = "flex flex-row justify-evenly items-center space-x-4";
   const cityInput = document.createElement("input");
   cityInput.type = "text";
   cityInput.placeholder = "City";
   cityInput.classList =
-    "w-1/4 max-md:w-1/2 rounded-md border-2 border-slate-500 text-center text-slate-500 outline-none";
+    "w-1/4 max-md:w-1/2 flex-grow rounded-md border-2 border-slate-500 text-center text-slate-500 outline-none";
   cityInput.id = "cityInput";
   cityInput.addEventListener("keyup", async (e) => {
     if (e.keyCode == 13) {
@@ -46,6 +48,22 @@ function GeneralContent(initialLocation, initial) {
       }
     }
   });
+
+  const searchButton = document.createElement("img");
+  searchButton.src = searchImg;
+  searchButton.width = "25";
+  searchButton.height = "25";
+  searchButton.classList = "cursor-pointer";
+  searchButton.addEventListener("click", async () => {
+    if (cityInput.value !== "") {
+      GeneralContent(cityInput.value);
+    }
+  });
+
+
+
+  SearchDiv.appendChild(cityInput);
+  SearchDiv.appendChild(searchButton);
 
   const metricInput = document.createElement("input"); // Celsius or Fahrenheit Switch
   metricInput.type = "checkbox";
@@ -72,7 +90,7 @@ function GeneralContent(initialLocation, initial) {
     WeatherDiv(mainDiv, initialLocation, true);
   }
 
-  header.appendChild(cityInput);
+  header.appendChild(SearchDiv);
   header.appendChild(headerTitle);
   header.appendChild(metricRadioButtonsList());
 
@@ -187,7 +205,7 @@ function switchHourlyDaily(weatherData) {
     isHourly = false;
     div1.style.backgroundColor = "gray"; // Set color to gray when the other div is clicked
     div2.style.backgroundColor = "green"; // Set color to green when clicked
-    DailyForecastDiv(weatherData);
+    DailyForecastDiv(weatherData.forecast.forecastday.slice(1));
   });
 
   if (!isHourly) {
@@ -256,7 +274,47 @@ function HourlyForecastDiv(dayweatherData,currentHour) {
 
 function DailyForecastDiv(dayweatherData) {
   const container = document.querySelector("#extraDataDiv");
-  container.innerHTML = "Daily";
+  container.classList = "w-full flex flex-col items-center justify-center lg:flex-row lg:justify-evenly lg:items-center";
+  container.innerHTML = "";
+
+  const tomorrowDiv = document.createElement("div");
+  tomorrowDiv.classList = "w-full flex flex-col space-y-2 items-center p-4 bg-slate-400 rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none m-5";
+  tomorrowDiv.innerHTML = `<h2 class='text-2xl text-slate-900 font-semibold'> ${
+    'Tomorrow: '+dayweatherData[0].date
+  } </h2>
+    <h3 class='text-xl text-slate-900 font-semibold'> Max: ${
+      isCelcius
+        ? dayweatherData[0].day.maxtemp_c + "°C"
+        : dayweatherData[0].day.maxtemp_f + "°F"
+    } | Low: ${
+    isCelcius
+      ? dayweatherData[0].day.mintemp_c + "°C"
+      : dayweatherData[0].day.mintemp_f + "°F"
+  }</h3>
+  <h4 class='text-lg text-slate-800 font-semibold'>Sun Rise: ${
+    dayweatherData[0].astro.sunrise
+  } | Sun Set: ${dayweatherData[0].astro.sunset}</h4>`;
+
+  const afterTomorrowDiv = document.createElement("div");
+  afterTomorrowDiv.classList = "w-full flex flex-col items-center space-y-2 p-4 bg-slate-400 rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none m-5";
+  afterTomorrowDiv.innerHTML = `<h2 class='text-2xl text-slate-900 font-semibold'> ${
+    'After Tomorrow: '+dayweatherData[1].date
+  } </h2>
+    <h3 class='text-xl text-slate-900 font-semibold'> Max: ${
+      isCelcius
+        ? dayweatherData[1].day.maxtemp_c + "°C"
+        : dayweatherData[1].day.maxtemp_f + "°F"
+    } | Low: ${
+    isCelcius
+      ? dayweatherData[1].day.mintemp_c + "°C"
+      : dayweatherData[1].day.mintemp_f + "°F"
+  }</h3>
+  <h4 class='text-lg text-slate-800 font-semibold'>Sun Rise: ${
+    dayweatherData[1].astro.sunrise
+  } | Sun Set: ${dayweatherData[1].astro.sunset}</h4>`;
+
+  container.appendChild(tomorrowDiv);
+  container.appendChild(afterTomorrowDiv);
 }
 
 function errorDiv(error, solution) {

@@ -13,10 +13,17 @@ let isCelcius = true;
 let isHourly = true;
 let currentLocation = null;
 
+let LoadingDiv = document.createElement("div");
+LoadingDiv.classList = "w-full h-full flex flex-col justify-center items-center";
+LoadingDiv.innerHTML = `<div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-500"></div>`;
+LoadingDiv.id = "LoadingDiv";
+
+
 function GeneralContent(initialLocation, initial) {
   const content = document.getElementById("content");
   content.innerHTML = "";
   content.classList = "w-full flex flex-col flex-grow justify-center";
+  content.appendChild(LoadingDiv);
   const header = document.createElement("header");
   header.classList =
     "w-full lg:h-1/6 h-36 px-8 bg-slate-500 flex flex-row justify-evenly items-center";
@@ -82,9 +89,11 @@ function GeneralContent(initialLocation, initial) {
         )
       );
     } else {
+      mainDiv.appendChild(LoadingDiv);
       WeatherDiv(mainDiv, initialLocation);
     }
   } else {
+    mainDiv.appendChild(LoadingDiv);
     WeatherDiv(mainDiv, initialLocation, true);
   }
 
@@ -95,6 +104,7 @@ function GeneralContent(initialLocation, initial) {
   main.appendChild(mainDiv);
   content.appendChild(header);
   content.appendChild(main);
+  content.removeChild(LoadingDiv);
 }
 
 async function WeatherDiv(mainDiv, initialLocation, isCity = false) {
@@ -161,6 +171,7 @@ async function WeatherDiv(mainDiv, initialLocation, isCity = false) {
   } else {
     DailyForecastDiv(weatherData.forecast.forecastday.slice(1));
   }
+  mainDiv.removeChild(LoadingDiv);
 }
 
 function switchHourlyDaily(weatherData) {

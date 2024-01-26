@@ -8,7 +8,8 @@
     "build": "webpack",
     "watch:css": "tailwindcss -i ./src/input.css -o ./src/output.css --watch",
     "watch:webpack": "webpack --watch",
-    "watch": "concurrently \"npm:watch:*\""
+    "watch": "concurrently \"npm:watch:*\"",
+    "deploy": "git subtree push --prefix dist origin gh-pages"
   },
   "keywords": [],
   "author": "",

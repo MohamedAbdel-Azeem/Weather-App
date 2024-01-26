@@ -1,6 +1,6 @@
 import tailwindcss from "./output.css";
 import { getWeatherData } from "./api.js";
-import GlideStyles from './glide.core.min.css';
+import GlideStyles from "./glide.core.min.css";
 import Glide from "@glidejs/glide";
 import searchImg from "./assets/searchIcon.png";
 
@@ -59,8 +59,6 @@ function GeneralContent(initialLocation, initial) {
       GeneralContent(cityInput.value);
     }
   });
-
-
 
   SearchDiv.appendChild(cityInput);
   SearchDiv.appendChild(searchButton);
@@ -156,7 +154,10 @@ async function WeatherDiv(mainDiv, initialLocation, isCity = false) {
   mainDiv.appendChild(switchHourlyDaily(weatherData));
   mainDiv.appendChild(extraDataDiv);
   if (isHourly) {
-    HourlyForecastDiv(weatherData.forecast.forecastday[0]["hour"],weatherData.location.localtime.split(" ")[1]);
+    HourlyForecastDiv(
+      weatherData.forecast.forecastday[0]["hour"],
+      weatherData.location.localtime.split(" ")[1]
+    );
   } else {
     DailyForecastDiv(weatherData.forecast.forecastday.slice(1));
   }
@@ -180,7 +181,10 @@ function switchHourlyDaily(weatherData) {
     isHourly = true;
     div1.style.backgroundColor = "green"; // Set color to green when clicked
     div2.style.backgroundColor = "gray"; // Set color to gray when the other div is clicked
-    HourlyForecastDiv(weatherData.forecast.forecastday[0]["hour"],weatherData.location.localtime.split(" ")[1]);
+    HourlyForecastDiv(
+      weatherData.forecast.forecastday[0]["hour"],
+      weatherData.location.localtime.split(" ")[1]
+    );
   });
 
   const label1 = document.createElement("label");
@@ -231,8 +235,8 @@ function switchHourlyDaily(weatherData) {
   return ul;
 }
 
-function HourlyForecastDiv(dayweatherData,currentHour) {
-  let newCurrentHour = currentHour.split(":")[0] + ':00';
+function HourlyForecastDiv(dayweatherData, currentHour) {
+  let newCurrentHour = currentHour.split(":")[0] + ":00";
   let currentIndex = 0;
   const container = document.querySelector("#extraDataDiv");
   container.innerHTML = `<div class="glide mx-8 mb-8">
@@ -247,40 +251,46 @@ function HourlyForecastDiv(dayweatherData,currentHour) {
 </div>`;
   const glideList = document.querySelector(".glide__slides");
 
-  dayweatherData.forEach((hour,index) => {
+  dayweatherData.forEach((hour, index) => {
     const glideItem = document.createElement("li");
     const isNow = hour.time.split(" ")[1] === newCurrentHour;
-    if(isNow) currentIndex = index;
-    glideItem.innerHTML = `<div class='glide__slide rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none ${(isNow)? 'bg-emerald-600' : 'bg-slate-400' } flex flex-col justify-center items-center'>
+    if (isNow) currentIndex = index;
+    glideItem.innerHTML = `<div class='glide__slide rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none ${
+      isNow ? "bg-emerald-600" : "bg-slate-400"
+    } flex flex-col justify-center items-center'>
     <h2 class='text-2xl text-slate-900 font-semibold'> ${
-      (isNow)? "Now" : hour.time.split(" ")[1]
+      isNow ? "Now" : hour.time.split(" ")[1]
     } </h2>
-    <h3 class='text-xl ${(isNow)? 'text-slate-800': 'text-slate-700'}'>${
+    <h3 class='text-xl ${isNow ? "text-slate-800" : "text-slate-700"}'>${
       isCelcius ? hour.temp_c + "°C" : hour.temp_f + "°F"
     }</h3>
-    <h4 class = 'text-lg ${(isNow)? 'text-slate-800': 'text-slate-700'}' >${hour.condition.text}</h4>
+    <h4 class = 'text-lg ${isNow ? "text-slate-800" : "text-slate-700"}' >${
+      hour.condition.text
+    }</h4>
     </div>`;
     glideList.appendChild(glideItem);
   });
 
   const glideConfig = {
-    type : "carousel",
-    perView : 3,
+    type: "carousel",
+    perView: 3,
     startAt: currentIndex - 1,
-  }
+  };
 
-  new Glide(".glide",glideConfig).mount();
+  new Glide(".glide", glideConfig).mount();
 }
 
 function DailyForecastDiv(dayweatherData) {
   const container = document.querySelector("#extraDataDiv");
-  container.classList = "w-full flex flex-col items-center justify-center lg:flex-row lg:justify-evenly lg:items-center";
+  container.classList =
+    "w-full flex flex-col items-center justify-center lg:flex-row lg:justify-evenly lg:items-center";
   container.innerHTML = "";
 
   const tomorrowDiv = document.createElement("div");
-  tomorrowDiv.classList = "w-full flex flex-col space-y-2 items-center p-4 bg-slate-400 rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none m-5";
+  tomorrowDiv.classList =
+    "w-full flex flex-col space-y-2 items-center p-4 bg-slate-400 rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none m-5";
   tomorrowDiv.innerHTML = `<h2 class='text-2xl text-slate-900 font-semibold'> ${
-    'Tomorrow: '+dayweatherData[0].date
+    "Tomorrow: " + dayweatherData[0].date
   } </h2>
     <h3 class='text-xl text-slate-900 font-semibold'> Max: ${
       isCelcius
@@ -296,9 +306,10 @@ function DailyForecastDiv(dayweatherData) {
   } | Sun Set: ${dayweatherData[0].astro.sunset}</h4>`;
 
   const afterTomorrowDiv = document.createElement("div");
-  afterTomorrowDiv.classList = "w-full flex flex-col items-center space-y-2 p-4 bg-slate-400 rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none m-5";
+  afterTomorrowDiv.classList =
+    "w-full flex flex-col items-center space-y-2 p-4 bg-slate-400 rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none m-5";
   afterTomorrowDiv.innerHTML = `<h2 class='text-2xl text-slate-900 font-semibold'> ${
-    'After Tomorrow: '+dayweatherData[1].date
+    "After Tomorrow: " + dayweatherData[1].date
   } </h2>
     <h3 class='text-xl text-slate-900 font-semibold'> Max: ${
       isCelcius

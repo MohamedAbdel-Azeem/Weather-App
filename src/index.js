@@ -138,7 +138,7 @@ async function WeatherDiv(mainDiv, initialLocation, isCity = false) {
   mainDiv.appendChild(switchHourlyDaily(weatherData));
   mainDiv.appendChild(extraDataDiv);
   if (isHourly) {
-    HourlyForecastDiv(weatherData.forecast.forecastday[0]["hour"]);
+    HourlyForecastDiv(weatherData.forecast.forecastday[0]["hour"],weatherData.location.localtime.split(" ")[1]);
   } else {
     DailyForecastDiv(weatherData.forecast.forecastday.slice(1));
   }
@@ -162,7 +162,7 @@ function switchHourlyDaily(weatherData) {
     isHourly = true;
     div1.style.backgroundColor = "green"; // Set color to green when clicked
     div2.style.backgroundColor = "gray"; // Set color to gray when the other div is clicked
-    HourlyForecastDiv(weatherData.forecast.forecastday[0]["hour"]);
+    HourlyForecastDiv(weatherData.forecast.forecastday[0]["hour"],weatherData.location.localtime.split(" ")[1]);
   });
 
   const label1 = document.createElement("label");
@@ -213,7 +213,9 @@ function switchHourlyDaily(weatherData) {
   return ul;
 }
 
-function HourlyForecastDiv(dayweatherData) {
+function HourlyForecastDiv(dayweatherData,currentHour) {
+  let newCurrentHour = currentHour.split(":")[0] + ':00';
+  let currentIndex = 0;
   const container = document.querySelector("#extraDataDiv");
   container.innerHTML = `<div class="glide mx-8 mb-8">
   <div class="glide__track" data-glide-el="track">
@@ -227,16 +229,18 @@ function HourlyForecastDiv(dayweatherData) {
 </div>`;
   const glideList = document.querySelector(".glide__slides");
 
-  dayweatherData.forEach((hour) => {
+  dayweatherData.forEach((hour,index) => {
     const glideItem = document.createElement("li");
-    glideItem.innerHTML = `<div class='glide__slide rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none bg-slate-400 flex flex-col justify-center items-center'>
+    const isNow = hour.time.split(" ")[1] === newCurrentHour;
+    if(isNow) currentIndex = index;
+    glideItem.innerHTML = `<div class='glide__slide rounded-lg shadow-md border-2 border-slate-500 text-center text-slate-500 outline-none ${(isNow)? 'bg-emerald-600' : 'bg-slate-400' } flex flex-col justify-center items-center'>
     <h2 class='text-2xl text-slate-900 font-semibold'> ${
-      hour.time.split(" ")[1]
+      (isNow)? "Now" : hour.time.split(" ")[1]
     } </h2>
-    <h3 class='text-xl text-slate-700'>${
+    <h3 class='text-xl ${(isNow)? 'text-slate-800': 'text-slate-700'}'>${
       isCelcius ? hour.temp_c + "°C" : hour.temp_f + "°F"
     }</h3>
-    <h4 class text-lg text-slate-700>${hour.condition.text}</h4>
+    <h4 class = 'text-lg ${(isNow)? 'text-slate-800': 'text-slate-700'}' >${hour.condition.text}</h4>
     </div>`;
     glideList.appendChild(glideItem);
   });
@@ -244,6 +248,7 @@ function HourlyForecastDiv(dayweatherData) {
   const glideConfig = {
     type : "carousel",
     perView : 3,
+    startAt: currentIndex - 1,
   }
 
   new Glide(".glide",glideConfig).mount();

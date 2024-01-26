@@ -2,11 +2,11 @@ import { WeatherApiKey } from "../API-Keys.js";
 
 
 function getUrlLatLng(lat, lng) {
-    return `http://api.weatherapi.com/v1/forecast.json?key=${WeatherApiKey}&q=${lat},${lng}&days=3&aqi=no&alerts=no`;
+    return `https://api.weatherapi.com/v1/forecast.json?key=${WeatherApiKey}&q=${lat},${lng}&days=3&aqi=no&alerts=no`;
 }
 
 function getUrlCity(city) {
-    return `http://api.weatherapi.com/v1/forecast.json?key=${WeatherApiKey}&q=${city}&days=3&aqi=no&alerts=no`;
+    return `https://api.weatherapi.com/v1/forecast.json?key=${WeatherApiKey}&q=${city}&days=3&aqi=no&alerts=no`;
 }
 
 async function getWeatherDataByUrl(url) {
